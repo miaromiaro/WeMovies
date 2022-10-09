@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+{% block title %}WeMovies!{% endblock %}
+
+{% block body %}
+    <nav class="navbar bg-light">
+        <div class="container">
+            <a class="navbar-brand">A propos de We Movies</a>
+            <form class="d-flex" role="search">
+                <input id="search-bar" class="form-control me-2" type="search" placeholder="Recherche (non fonctionnel)" aria-label="Search">
+                <span id="search-bar-icon" class="input-group-text">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+</svg>
+                </span>
+            </form>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row g-3"></div>
+        <div class="row">
+            <div class="row g-0 mt-4 p-3">
+                <div class="align-middle ratio ratio-16x9">
+                    <iframe src="{{ topMovie.urlVideo}}?rel=0" title="YouTube video" allowfullscreen></iframe>
+                </div>
+                <div class="row miniature-trailer">
+                    <div class="col-xs-4 col-md-2">
+                        <img class="img-fluid" src="{{ topMovie.thumbnail }}"
+                             alt="Card image cap">
+                    </div>
+                    <div class="col-xs-4 col-md-6 bande-annonce-text">
+                        <h3 class="card-title titre-bande-annonce pt-3">{{ topMovie.title }}</h3>
+                        <h4 class="card-text bande-annonce-text">{{ topMovie.title }} Bande annonce {% if topMovie.originalLanguage =="fr" %}VF{% else %}VOSTFR{% endif %}</h4>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-5 col-lg-4 ">
+{#                {{ render(controller('App\\Controller\\DefaultController::getAllGendre')) }}#}
+            </div>
+            <div class="col-md-7 col-lg-8  order-md-last" >
+                <div id='listMovies'>
+                    <h4 class="mb-3">Movies</h4>
+                    {% for movie in listMovies|slice(1) %}
+                        <div class="card mb-3" style="max-width: 800px;">
+                            <div class="row no-gutters">
+                                <div class="col-md-4">
+                                    <img class="img-fluid" src="{{ movie.thumbnail }}"
+                                         alt="Card image cap">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ movie.title }}</h5>  <p class="card-text">({{ movie.voteCount }} votes)</p>
+                                        <div class="rating d-inline">
+                                            <i class="bi bi-star{% if movie.voteAverage >= 2 %}-fill{% elseif movie.voteAverage > 0 %}-half{% endif %}"></i>
+                                            <i class="bi bi-star{% if movie.voteAverage >= 4 %}-fill{% elseif movie.voteAverage > 2 %}-half{% endif %}"></i>
+                                            <i class="bi bi-star{% if movie.voteAverage >= 6 %}-fill{% elseif movie.voteAverage > 4 %}-half{% endif %}"></i>
+                                            <i class="bi bi-star{% if movie.voteAverage >= 8 %}-fill{% elseif movie.voteAverage > 6 %}-half{% endif %}"></i>
+                                            <i class="bi bi-star{% if movie.voteAverage == 10 %}-fill{% elseif movie.voteAverage > 8 %}-half{% endif %}"></i>
+                                        </div>
+                                        <p class="card-text"><small class="text-muted">{{ movie.releaseDate|date("Y") }}-{{ movie.productionName }}</small></p>
+                                        <p class="card-text">{{ movie.description }}</p>
+                                        <button type="button" class="btn btn-primary"  onclick="show({{ movie.id }})" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                            Lire le detail
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div id='detailMovie'>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}
+
+
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('movie') }}
+{% endblock %}

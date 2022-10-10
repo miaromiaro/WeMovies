@@ -6,7 +6,7 @@
         <div class="container">
             <a class="navbar-brand">A propos de We Movies</a>
             <form class="d-flex" role="search">
-                <input id="search-bar" class="form-control me-2" type="search" placeholder="Recherche (non fonctionnel)" aria-label="Search">
+                <input id="search-bar" class="form-control me-2" type="search" placeholder="Recherche" aria-label="Search">
                 <span id="search-bar-icon" class="input-group-text">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
   <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
@@ -17,8 +17,7 @@
     </nav>
 
     <div class="container">
-        <div class="row g-3"></div>
-        <div class="row">
+        <div class="frame-trailer">
             <div class="row g-0 mt-4 p-3">
                 <div class="align-middle ratio ratio-16x9">
                     <iframe src="{{ topMovie.urlVideo}}?rel=0" title="YouTube video" allowfullscreen></iframe>
@@ -30,20 +29,46 @@
                     </div>
                     <div class="col-xs-4 col-md-6 bande-annonce-text">
                         <h3 class="card-title titre-bande-annonce pt-3">{{ topMovie.title }}</h3>
-                        <h4 class="card-text bande-annonce-text">{{ topMovie.title }} Bande annonce {% if topMovie.originalLanguage =="fr" %}VF{% else %}VOSTFR{% endif %}</h4>
+{#                        <h4 class="card-text bande-annonce-text">{{ topMovie.title }} Bande annonce {% if topMovie.originalLanguage =="fr" %}VF{% else %}VOSTFR{% endif %}</h4>#}
+                        <h4 class="card-text bande-annonce-text">{{ topMovie.title }} Trailer</h4>
                     </div>
 
                 </div>
+                <div class="text-bg-light p-3">
+                    {{ topMovie.description }}
+                </div>
+
             </div>
         </div>
 
         <div class="row g-3">
             <div class="col-md-5 col-lg-4 ">
-{#                {{ render(controller('App\\Controller\\DefaultController::getAllGendre')) }}#}
+                <div>
+                    <h4 class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="text-muted">Genre</span>
+                    </h4>
+                    <ul class="list-group mb-3">
+
+                        {% for genre in allGenre %}
+                            <li class="list-group-item d-flex justify-content-between lh-sm">
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input radioCheck genreCheckbox" onclick=""
+                                           value="{{ genre.id }}" id="checkbox-{{ genre.id }}" {% if genre.id==genreSelected %}checked{% endif %}/>
+                                    <label class="form-check-label" for="flexCheckDefault">
+                                        {{ genre.name }}
+                                    </label>
+                                </div>
+                            </li>
+
+
+                        {% endfor %}
+                    </ul>
+                </div>
+
             </div>
             <div class="col-md-7 col-lg-8  order-md-last" >
                 <div id='listMovies'>
-                    <h4 class="mb-3">Movies</h4>
+                    <h4 class="mb-3">List of movies</h4>
                     {% for movie in listMovies|slice(1) %}
                         <div class="card mb-3" style="max-width: 800px;">
                             <div class="row no-gutters">
@@ -54,20 +79,45 @@
                                 <div class="col-md-8">
                                     <div class="card-body">
                                         <h5 class="card-title">{{ movie.title }}</h5>  <p class="card-text">({{ movie.voteCount }} votes)</p>
-                                        <div class="rating d-inline">
-                                            <i class="bi bi-star{% if movie.voteAverage >= 2 %}-fill{% elseif movie.voteAverage > 0 %}-half{% endif %}"></i>
-                                            <i class="bi bi-star{% if movie.voteAverage >= 4 %}-fill{% elseif movie.voteAverage > 2 %}-half{% endif %}"></i>
-                                            <i class="bi bi-star{% if movie.voteAverage >= 6 %}-fill{% elseif movie.voteAverage > 4 %}-half{% endif %}"></i>
-                                            <i class="bi bi-star{% if movie.voteAverage >= 8 %}-fill{% elseif movie.voteAverage > 6 %}-half{% endif %}"></i>
-                                            <i class="bi bi-star{% if movie.voteAverage == 10 %}-fill{% elseif movie.voteAverage > 8 %}-half{% endif %}"></i>
-                                        </div>
+                                        {% include 'include/star.twig' with {'movie': movie} %}
                                         <p class="card-text"><small class="text-muted">{{ movie.releaseDate|date("Y") }}-{{ movie.productionName }}</small></p>
-                                        <p class="card-text">{{ movie.description }}</p>
-                                        <button type="button" class="btn btn-primary"  onclick="show({{ movie.id }})" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                        <p class="card-text">{{ movie.description|length > 50 ? movie.description|slice(0, 200) ~ '...' : movie.description  }}</p>
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-movie-{{ movie.id }}">
                                             Lire le detail
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+
+                            {# Modal for this movie shown when you click on the button #}
+                            <div class="modal fade modal-movie" id="modal-movie-{{ movie.id }}" tabindex="-1" aria-labelledby="informationTitle" aria-hidden="true" data-id="{{ movie.id }}">
+                                {#<div class="modal-dialog modal-xl">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="informationTitle">{{ movie.title }}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" data-id="{{ movie.id }}"></button>
+                                        </div>
+                                        <div class="modal-body p-4">
+                                            <div class="row col-xs-2">
+                                                <div class="row g-0 mb-4 frame-trailer-detail">
+                                                    <div class="ratio ratio-16x9">
+                                                        <iframe src="{{ movie.urlVideo }}?rel=0" title="YouTube video" allowfullscreen></iframe>
+                                                    </div>
+                                                </div>
+                                                <div class="row d-inline">
+#}{#                                                    <span class="text-secondary">Film : </span><b class="card-title d-inline">{{ movie.title }} Bande annonce {% if topMovie.originalLanguage =="fr" %}VF{% else %}VOSTFR{% endif %}</b>#}{#
+                                                    <span class="text-secondary">Film : </span><b class="card-title d-inline">{{ movie.title }} - Trailer</b>
+                                                    {% include 'include/star.twig' with {'movie': movie} %}
+                                                    <span class="text-light bg-dark">{{ (movie.voteAverage / 2)|number_format(2) }}</span><span class="d-inline fs-6"> pour {{ movie.voteCount }} utilisateurs</span>
+                                                </div>
+                                                <p class="card-text">
+                                                    <small class="text-muted"><small class="text-muted">{{ movie.releaseDate|date("Y") }}-{{ movie.productionName }}</small></small>
+                                                </p>
+                                                <p class="card-text mt-2">{{ movie.description }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>#}
                             </div>
                         </div>
                     {% endfor %}

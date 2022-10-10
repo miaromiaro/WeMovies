@@ -19,25 +19,7 @@ class Movie
 
     private $voteCount;
 
-    /**
-     * @return mixed
-     */
-    public function getVoteCount()
-    {
-        return $this->voteCount;
-    }
-
-    /**
-     * @param mixed $voteCount
-     */
-    public function setVoteCount($voteCount): void
-    {
-        $this->voteCount = $voteCount;
-    }
-
     private $voteAverage;
-
-    private $numberUserVoting;
 
     private $urlVideo;
 
@@ -77,7 +59,6 @@ class Movie
      * @param $productionName
      * @param $description
      * @param $voteAverage
-     * @param $numberUserVoting
      */
 
 
@@ -147,18 +128,6 @@ class Movie
         return $this;
     }
 
-    public function getNumberUserVoting(): ?int
-    {
-        return $this->numberUserVoting;
-    }
-
-    public function setNumberUserVoting(?int $numberUserVoting): self
-    {
-        $this->numberUserVoting = $numberUserVoting;
-
-        return $this;
-    }
-
     /**
      * @return mixed
      */
@@ -184,7 +153,6 @@ class Movie
             'description'=>$this->description,
             'voteAverage'=>$this->voteAverage,
             'voteCount'=>$this->voteCount,
-            'numberUserVoting'=>$this->numberUserVoting,
             'urlVideo'=>$this->urlVideo,
             'thumbnail'=>$this->thumbnail,
             'originalLanguage'=>$this->originalLanguage,
@@ -206,5 +174,19 @@ class Movie
     {
         $this->thumbnail = $thumbnail;
     }
+    /**
+     * @return mixed
+     */
+    public function getVoteCount()
+    {
+        return $this->voteCount;
+    }
 
+    /**
+     * @param mixed $voteCount
+     */
+    public function setVoteCount($voteCount): void
+    {
+        $this->voteCount = $voteCount;
+    }
 }

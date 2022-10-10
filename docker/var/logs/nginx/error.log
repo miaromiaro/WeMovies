@@ -1,0 +1,5 @@
+2022/10/09 23:28:27 [emerg] 1#0: host not found in upstream "app" in /etc/nginx/conf.d/app.conf:21
+2022/10/09 23:36:02 [emerg] 1#0: host not found in upstream "app" in /etc/nginx/sites-enabled/app:21
+2022/10/10 00:16:41 [emerg] 1#0: host not found in upstream "php:9000" in /etc/nginx/conf.d/upstream.conf:1
+2022/10/10 00:20:23 [emerg] 1#0: host not found in upstream "php:9000" in /etc/nginx/conf.d/upstream.conf:1
+2022/10/10 00:28:05 [emerg] 1#0: host not found in upstream "php:9000" in /etc/nginx/conf.d/upstream.conf:1

@@ -72,9 +72,6 @@ class MovieUtils
             //Vote account
             $voteCount = $movieFromApi['vote_count'] ?? 0;
 
-            //Number of user who do voting
-            $numberUserVoting = $voteCount * $voteAverage;
-
             //Get video url trailer
             $urlVideo = MovieUtils::getUrlTrailerMovie($detailVideo);
 
@@ -92,7 +89,6 @@ class MovieUtils
             $movie->setProductionName($productionName);
             $movie->setVoteAverage($voteAverage);
             $movie->setVoteCount($voteCount);
-            $movie->setNumberUserVoting($numberUserVoting);
             $movie->setUrlVideo($urlVideo);
             $movie->setThumbnail($thumbnail);
             $movie->setOriginalLanguage($originalLanguage);

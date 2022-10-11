@@ -23,13 +23,21 @@ Install dependancies
 
 ```bash
 $ docker exec -it wemovie_php bash
-# composer instal
+# composer install
 # npm install
 ```
 
-#And open this url on browser
-http://localhost:8009
+If not run on docker launch (out of docker)
+```bash
+# exit
+$ npm run build
+```
 
-Launch unit test
+link http://localhost:8009
+
+Test
 ----------------------------
+Launch unit test
+```bash
 $ php bin/phpunit
+```

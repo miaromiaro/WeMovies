@@ -7,7 +7,6 @@ namespace App\Service;
 use App\Entity\GenreMovie;
 use App\Entity\Movie;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class TheMovieDatabase implements MovieInterface
@@ -20,15 +19,14 @@ class TheMovieDatabase implements MovieInterface
      * @var string
      */
     private $baseUrl;
-    /**
-     * @var KernelInterface
-     */
-    private $kernel;
 
     private $langageCode;
 
+    private $apiKey;
+
     private const API_ALL_GENRE = '/genre/movie/list';
     private const API_MOVIE_BY_GENRE  = '/discover/movie';
+    private const API_SEARCH_MOVIE  = '/search/movie';
     private const URL_MOVIE_DETAIL = '/movie/[id_movie]';
     private const URL_VIDEO_MOVIE_DETAIL = '/movie/[id_movie]/videos';
     /**
@@ -36,12 +34,12 @@ class TheMovieDatabase implements MovieInterface
      */
     private $movieUtils;
 
-    public function __construct(HttpClientInterface $client, KernelInterface $kernel,MovieUtils $movieUtils)
+    public function __construct(HttpClientInterface $client, string $urlApiTmdb, string $tmdbLanguage, string $apiKeyTmdb ,MovieUtils $movieUtils)
     {
         $this->client = $client;
-        $this->kernel = $kernel;
-        $this->baseUrl = $this->kernel->getContainer()->getParameter('app.url_api_tmdb');
-        $this->langageCode = MovieUtils::languageCode($this->kernel->getContainer()->getParameter('app.tmdb_language'));
+        $this->baseUrl = $urlApiTmdb;
+        $this->apiKey = $apiKeyTmdb;
+        $this->langageCode = MovieUtils::languageCode($tmdbLanguage);
         $this->movieUtils = $movieUtils;
     }
 
@@ -58,9 +56,9 @@ class TheMovieDatabase implements MovieInterface
      */
     private function requestToApi(string $urlEndPoint, array $criteria = [], string $method = 'GET'): array
     {
-        $urlEndPoint = $this->kernel->getContainer()->getParameter('app.url_api_tmdb').$urlEndPoint;
+        $urlEndPoint = $this->baseUrl.$urlEndPoint;
         $criteria = [
-            'query' => array_merge($criteria, ['api_key' => $this->kernel->getContainer()->getParameter('app.api_key_tmdb')])
+            'query' => array_merge($criteria, ['api_key' => $this->apiKey])
         ];
 
         return $this->client->request($method, $urlEndPoint, $criteria)->toArray();
@@ -83,7 +81,7 @@ class TheMovieDatabase implements MovieInterface
         //language argument
         $criteria['language'] = $this->langageCode;
 
-        //Id Genre argument if exist
+        //Find genre if exist
         if (!is_null($idGenre)) {
             $criteria['with_genres'] = $idGenre;
         }
@@ -97,6 +95,29 @@ class TheMovieDatabase implements MovieInterface
         // Get list of movies by genre to API TMDTB
         $response = $this->requestToApi(self::API_MOVIE_BY_GENRE, $criteria);
 
+        $moviesList = new ArrayCollection();
+
+        foreach ($response['results'] as $movie) {
+            //get video detail for each movie
+            $moviesList->add($this->getMovieDetails($movie['id']));
+        }
+
+        // We return this collection sort by vote average
+        return MovieUtils::sortMoviesByVoteAverage($moviesList);
+    }
+
+    public function findMovie(string $movieToFind): array
+    {
+        //language argument
+        $criteria['language'] = $this->langageCode;
+
+        //find the movie if search text exist
+        if (!is_null($movieToFind)) {
+            $criteria['query'] = $movieToFind;
+        }
+
+        // Get list of movies by genre to API TMDTB
+        $response = $this->requestToApi(self::API_SEARCH_MOVIE, $criteria);
 
         $moviesList = new ArrayCollection();
 

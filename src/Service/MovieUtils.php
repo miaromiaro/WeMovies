@@ -3,28 +3,12 @@
 
 namespace App\Service;
 
-
 use App\Entity\Movie;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 
 class MovieUtils
 {
-    /**
-     * @var KernelInterface
-     */
-    private $kernel;
-    /**
-     * @var TheMovieDatabase
-     */
-    private $theMovieDatabase;
-
-    public function __construct(KernelInterface $kernel)
-    {
-        $this->kernel = $kernel;
-    }
-
     public static function languageCode(string $language){
         switch ($language){
             case "french":
@@ -37,8 +21,6 @@ class MovieUtils
                 return "fr-FR";
         }
     }
-
-
 
     public static function DTOMovie(array $movieFromApi, array $detailVideo):Movie
     {
@@ -93,12 +75,8 @@ class MovieUtils
             $movie->setThumbnail($thumbnail);
             $movie->setOriginalLanguage($originalLanguage);
 
-            return $movie;
         }
-
-        else{
-           return $movie;
-        }
+        return $movie;
     }
 
     public static function sortMoviesByVoteAverage(ArrayCollection $movieFromApi):array
@@ -140,5 +118,4 @@ class MovieUtils
         }
         return $url;
     }
-
 }

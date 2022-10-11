@@ -9,13 +9,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class DefaultController extends AbstractController implements MovieInterface
+class DefaultController extends AbstractController
 {
-
-    /**
-     * @var TheMovieDatabase
-     */
-    private $theMovieDatabase;
+    private TheMovieDatabase $theMovieDatabase;
 
 
     public function __construct(TheMovieDatabase $theMovieDatabase)
@@ -27,7 +23,7 @@ class DefaultController extends AbstractController implements MovieInterface
     public function index(): Response
     {
         //load genre movie
-        $allGenre = $this->getAllGenreMovie();
+        $allGenre = $this->theMovieDatabase->getAllGenreMovie();
 
         //Get random genre
         $allGenreId= array_map(function($genre){return $genre->getId();},$allGenre);
@@ -35,7 +31,7 @@ class DefaultController extends AbstractController implements MovieInterface
         $randomIdGenre = $allGenreId[array_key_first($allGenreId)];
 
         //get all movie by genre
-        $listMovies = $this->theMovieDatabase->getMoviesByGenre($randomIdGenre);//dd($listMovies);
+        $listMovies = $this->theMovieDatabase->getMoviesByGenre($randomIdGenre);
 
         //get the top movie
         $topMovie = MovieUtils::getTopMovie($listMovies);
@@ -50,26 +46,45 @@ class DefaultController extends AbstractController implements MovieInterface
         ]);
     }
 
-
-    public function getAllGenreMovie()
+    #[Route(path: '/topMovie/{idGenre}', name: 'topMovie', methods: ['GET'])]
+    public function getTopMovie(int $idGenre)
     {
-        $result = $this->theMovieDatabase->getAllGenreMovie();
-        return $result;
+        $listMovies = $this->theMovieDatabase->getMoviesByGenre($idGenre);
+        $result = MovieUtils::getTopMovie($listMovies);
+
+        return $this->render('include/topMovie.html.twig', [
+            'controller_name' => 'DefaultController',
+            'topMovie' =>$result,
+        ]);
     }
-    
-    #[Route(path: '/moviesByGenre', name: 'moviesByGenre', options: ['expose' => true])]
+
+    #[Route(path: '/moviesByGenre/{idGenre}', name: 'moviesByGenre', methods: ['GET'])]
     public function getMoviesByGenre(int $idGenre)
     {
         $listMovies = $this->theMovieDatabase->getMoviesByGenre($idGenre);
-        return $this->render('default/movieByGenre.twig', [
-            'controller_name' => 'GetMoviesByScene',
+
+        return $this->render('include/listMovies.html.twig', [
             'listMovies' =>$listMovies,
         ]);
     }
 
+    #[Route(path: '/detailMovie/{idMovie}', name: 'detailMovie', methods: ['GET'])]
     public function getMovieDetails(int $idMovie)
     {
-        $result = $this->theMovieDatabase->getMovieDetails($idMovie);
-        return $result;
+        $movie = $this->theMovieDatabase->getMovieDetails($idMovie);
+        return $this->render('modal/detailMovie.html.twig', [
+            'movie' =>$movie,
+        ]);
+    }
+
+    #[Route(path: '/findMovie/{movieToFind}', name: 'movieToFind', methods: ['GET'])]
+    public function findMovie(string $movieToFind){
+        $listMovies = $this->theMovieDatabase->findMovie($movieToFind);
+
+        return $this->render('include/listMovies.html.twig', [
+            'listMovies' =>$listMovies,
+            'resultNumber'=>count($listMovies),
+            'movieToFind'=>$movieToFind
+        ]);
     }
 }

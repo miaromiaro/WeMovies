@@ -1,30 +1,68 @@
 <?php
 namespace App\Test\Service;
 
-use App\Service\MovieInterface;
-use PHPUnit\Framework\TestCase;
 
-class TheMovieDatabaseTest extends TestCase implements MovieInterface
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+
+class TheMovieDatabaseTest extends WebTestCase
 {
-    public function testGettingAllGenre()
+    const TheMovieDatabaseService = "App\Service\TheMovieDatabase";
+    protected $client;
+
+    protected $serviceMovieDatabase;
+
+
+    public function setup():void
     {
-        $result = 42;
-        $this->assertEquals(42,$result);
+        $this->client = static::createClient();
+        $this->serviceMovieDatabase = $this->client->getContainer()->get(self::TheMovieDatabaseService);
     }
 
-    public function getAllGenreMovie()
+    public function testGetAllGenreMovie():void
     {
-        $service = new TheMovieDatabaseTest();
-        $this->assertIsArray();
+        $this->assertNotEmpty($this->serviceMovieDatabase->getAllGenreMovie());
     }
 
-    public function getMoviesByGenre(int $idGenre)
+    public function testGetMoviesByGenre():void
     {
-        // TODO: Implement getMoviesByGenre() method.
+        $allGenre = $this->serviceMovieDatabase->getAllGenreMovie();
+        $allGenreId= array_map(function($genre){return $genre->getId();},$allGenre);
+
+        //get one genre
+        $oneGenreId = $allGenreId[array_key_first($allGenreId)];
+
+        $this->assertNotEmpty($this->serviceMovieDatabase->getMoviesByGenre($oneGenreId));
     }
 
-    public function getMovieDetails(int $idMovie)
+    public function testGetMovieDetail():void
     {
-        // TODO: Implement getMovieDetails() method.
+        $allGenre = $this->serviceMovieDatabase->getAllGenreMovie();
+        $allGenreId= array_map(function($genre){return $genre->getId();},$allGenre);
+        $oneGenreId = $allGenreId[array_key_first($allGenreId)];
+        $allMovie = $this->serviceMovieDatabase->getMoviesByGenre($oneGenreId);
+        //get one movie
+        $oneMovieId = $allMovie[array_key_first($allMovie)]->getId();
+
+        $this->assertNotEmpty($this->serviceMovieDatabase->getMovieDetails($oneMovieId));
+    }
+
+    public function testVideoDetail():void
+    {
+        $allGenre = $this->serviceMovieDatabase->getAllGenreMovie();
+        $allGenreId= array_map(function($genre){return $genre->getId();},$allGenre);
+        $oneGenreId = $allGenreId[array_key_first($allGenreId)];
+        $allMovie = $this->serviceMovieDatabase->getMoviesByGenre($oneGenreId);
+        //get one movie
+        $oneMovieId = $allMovie[array_key_first($allMovie)]->getId();
+
+        $this->assertNotEmpty($this->serviceMovieDatabase->getVideoMovieDetails($oneMovieId));
+    }
+
+    public function testFindMovie():void
+    {
+        $movieWhoExist = "spiderman";
+        $movieWhoDoesNotExist = "nginx";
+        $this->assertNotEmpty($this->serviceMovieDatabase->findMovie($movieWhoExist));
+        $this->assertEmpty($this->serviceMovieDatabase->findMovie($movieWhoDoesNotExist));
     }
 }

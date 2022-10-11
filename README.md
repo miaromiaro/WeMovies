@@ -29,3 +29,7 @@ $ docker exec -it wemovie_php bash
 
 #And open this url on browser
 http://localhost:8009
+
+Launch unit test
+----------------------------
+$ php bin/phpunit

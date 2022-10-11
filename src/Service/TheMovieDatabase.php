@@ -24,11 +24,11 @@ class TheMovieDatabase implements MovieInterface
 
     private $apiKey;
 
-    private const API_ALL_GENRE = '/genre/movie/list';
-    private const API_MOVIE_BY_GENRE  = '/discover/movie';
-    private const API_SEARCH_MOVIE  = '/search/movie';
-    private const URL_MOVIE_DETAIL = '/movie/[id_movie]';
-    private const URL_VIDEO_MOVIE_DETAIL = '/movie/[id_movie]/videos';
+    public const API_ALL_GENRE = '/genre/movie/list';
+    public const API_MOVIE_BY_GENRE  = '/discover/movie';
+    public const API_SEARCH_MOVIE  = '/search/movie';
+    public const URL_MOVIE_DETAIL = '/movie/[id_movie]';
+    public const URL_VIDEO_MOVIE_DETAIL = '/movie/[id_movie]/videos';
     /**
      * @var MovieUtils
      */

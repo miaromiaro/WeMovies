@@ -18,6 +18,9 @@
         </div>
 
         {% block javascripts %}
+            <script>
+                var srcImgLoader = '{{ asset('/build/images/loader.gif') }}';
+            </script>
             {{ encore_entry_script_tags('app') }}
         {% endblock %}
     </body>
